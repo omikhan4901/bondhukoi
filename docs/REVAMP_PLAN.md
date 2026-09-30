@@ -20,7 +20,7 @@ so anything in ResumeX about those is left out.
 | 5. Finish, cut or fix features | ✅ Done | Google sign-in stays off (D2 note); offline banner |
 | 6. Admin console | ✅ Done | Alert emails (needs SMTP) |
 | 7. Testing | ✅ Automated (81 API tests, app units, fuzz, CI) | **You:** run `e2e/run.sh` on an emulator once, the real-phone checklist, the load test on staging |
-| 8. Play Store release | ✅ Prepared (`docs/release.md`, site, store listing) | **You:** Play developer account, fill `[contact email]`, closed test |
+| 8. Play Store release | ✅ Prepared (`docs/release.md`, site, store listing) | **You:** Play developer account, closed test |
 | 9. Marketing and launch | ✅ Kit ready (`docs/marketing/`) | **You:** Facebook page, beta invites; record the videos on a phone |
 
 The decision log at the end records every choice made along the way.

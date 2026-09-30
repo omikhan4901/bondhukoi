@@ -42,7 +42,7 @@
 >
 > Now open at North South University. More universities soon.
 
-**Category:** Social · **Tags:** Social, Education · **Contact email:** [contact email] ·
+**Category:** Social · **Tags:** Social, Education · **Contact email:** omi@omikhan.com ·
 **Website:** https://bondhukoi.pages.dev · **Privacy policy:** https://bondhukoi.pages.dev/privacy
 
 ## Graphics

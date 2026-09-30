@@ -52,7 +52,7 @@ who's on campus", "find your friends between classes", "private by design".
 - [ ] Production is live (docs/deploy.md) and the app is in Google Play **closed testing**.
 - [ ] You've done the real-phone checklist (docs/testing.md) on at least two phones.
 - [ ] The NSU campus boundary is drawn (Admin → Universities).
-- [ ] The website is live with the privacy policy, and `[contact email]` is filled in.
+- [ ] The website is live with the privacy policy, with omi@omikhan.com as the contact email.
 
 ### Facebook page
 - [ ] Create a Page named **BondhuKoi**, category *App page* or *Software*.
