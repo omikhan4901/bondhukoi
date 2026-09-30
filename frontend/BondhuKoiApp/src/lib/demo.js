@@ -1,3 +1,5 @@
+import { config } from './config';
+
 /**
  * Sample data for the demo build (EXPO_PUBLIC_DEMO=1): design previews and store
  * screenshots. Everyone here is made up. Changes are kept in memory only.
@@ -130,9 +132,20 @@ const routes = {
   'GET /api/presence/zones': () => ({ zones: [] }),
 };
 
+const EMPTY = {
+  'GET /api/friends': () => ({ friends: [] }),
+  'GET /api/friends/requests': () => ({ incoming: [], outgoing: [] }),
+  'GET /api/circles': () => ({ circles: [] }),
+  'GET /api/circles/invitations': () => ({ invitations: [] }),
+  'GET /api/notifications': () => ({ waiting: [], alerts: [], nextBefore: null }),
+  'GET /api/blocks': () => ({ blocked: [] }),
+  'GET /api/me/presence': () => ({ presence: { state: 'away', onCampus: false, circles: [], updatedAt: new Date().toISOString() } }),
+};
+
 export async function demoApi(method, path, body) {
   await new Promise((r) => setTimeout(r, 150));
   const clean = path.split('?')[0];
+  if (config.demoEmpty && EMPTY[`${method} ${clean}`]) return EMPTY[`${method} ${clean}`]();
   const handler = routes[`${method} ${clean}`];
   if (handler) return handler();
   if (method === 'POST' && clean === '/api/signup-check') return { ok: true, university: 'North South University' };

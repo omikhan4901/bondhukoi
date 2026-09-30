@@ -9,7 +9,7 @@ import { api } from '../../../src/lib/api';
 import { permissionStatus } from '../../../src/location/location';
 import { useRefreshLocation } from '../../../src/location/LocationSyncContext';
 import { config } from '../../../src/lib/config';
-import { timeAgo, hourLabel } from '../../../src/lib/format';
+import { timeAgo, hourLabel, spacedCode } from '../../../src/lib/format';
 
 function usePermission() {
   const [status, setStatus] = useState(null);
@@ -137,7 +137,7 @@ export default function Home() {
         <EmptyState
           icon={Users}
           title="Add your first friend"
-          message={`Share your code ${me.data?.user.friendCode ?? ''} or scan theirs. You’ll see when they’re on campus.`}
+          message={`Share your code ${spacedCode(me.data?.user.friendCode ?? '')} or scan theirs. You’ll see when they’re on campus.`}
           action="Share my code"
           onAction={() =>
             Share.share({ message: `Add me on BondhuKoi: my code is ${me.data?.user.friendCode}. Get the app: https://bondhukoi.pages.dev` })
