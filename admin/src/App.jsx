@@ -7,11 +7,7 @@ function Logo() {
   return (
     <div className="flex items-center gap-2.5">
       <svg width="32" height="32" viewBox="0 0 40 40" aria-hidden>
-        <rect width="40" height="40" rx="11" fill="#c2410c" />
-        <circle cx="16.5" cy="18" r="3.2" fill="#fff" />
-        <circle cx="23.5" cy="18" r="3.2" fill="#fff" />
-        <path d="M11.8 26.4c1-2.6 2.8-4 4.7-4s3.2 1 3.5 2.4c.3-1.4 1.6-2.4 3.5-2.4s3.7 1.4 4.7 4" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" fill="none" />
-      </svg>
+        <rect width="40" height="40" rx="11" fill="#c2410c" /><circle cx="20" cy="20" r="12.6" stroke="#fff" strokeWidth="2.2" strokeDasharray="3.3 2.7" fill="none"/><circle cx="17" cy="20" r="4.8" fill="#fff"/><circle cx="23" cy="20" r="4.8" fill="#fff" fillOpacity=".72"/></svg>
       <span className="font-display text-xl font-bold tracking-tight">
         Bondhu<span className="text-brand">Koi</span> <span className="text-slate-400 font-sans text-sm font-medium">Admin</span>
       </span>
