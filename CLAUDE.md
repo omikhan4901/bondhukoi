@@ -12,7 +12,7 @@ credits, payments or pricing.
   to Supabase Storage for images, and verifies Supabase Auth JWTs.
 - `supabase/`: the database as code: `migrations/` (applied in order, never edited after
   they ship; add a new one instead) and `config.toml` for the local stack.
-- `frontend/BondhuKoiApp/`: Expo React Native app (Expo Router, Tamagui).
+- `frontend/BondhuKoiApp/`: Expo React Native app (Expo Router, own component kit in `src/ui`).
 - `admin/`: the web admin console (Phase 6).
 - `docs/`: plan, design rules, security review, marketing kit.
 
