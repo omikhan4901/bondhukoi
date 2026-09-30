@@ -5,7 +5,7 @@ import { Text, IconTile } from '../ui';
 import { useTheme } from '../theme/ThemeProvider';
 
 /** Maps don't run in the web preview; this stands in for the zone editor there. */
-export const ZoneEditor = forwardRef(function ZoneEditor({ height = 380 }, ref) {
+export const ZoneEditor = forwardRef(function ZoneEditor({ height = 400 }, ref) {
   const { c, radius, space } = useTheme();
   useImperativeHandle(ref, () => ({ snapshot: async () => null }));
   return (

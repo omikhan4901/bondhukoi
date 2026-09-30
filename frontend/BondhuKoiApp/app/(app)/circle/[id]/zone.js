@@ -12,14 +12,14 @@ export default function EditZone() {
   const editor = useRef(null);
   const refreshLocation = useRefreshLocation();
   const [confirm, dialog] = useConfirm();
-  const [points, setPoints] = useState([]);
-  const onChange = useCallback((p) => setPoints(p), []);
+  const [draft, setDraft] = useState({ points: [], closed: false });
+  const onChange = useCallback((points, closed) => setDraft({ points, closed }), []);
   const invalidate = [keys.zone(id), keys.circle(id), keys.circles];
 
   const save = useAction(
     async () => {
       const snapshot = await editor.current?.snapshot();
-      return api(`/api/circles/${id}/zone`, { method: 'PUT', body: { boundary: points, ...(snapshot ? { snapshotBase64: snapshot } : {}) } });
+      return api(`/api/circles/${id}/zone`, { method: 'PUT', body: { boundary: draft.points, ...(snapshot ? { snapshotBase64: snapshot } : {}) } });
     },
     {
       invalidate,
@@ -36,7 +36,7 @@ export default function EditZone() {
     <Screen
       footer={
         <>
-          <Button title="Save zone" disabled={points.length < 3} loading={save.isPending} onPress={() => save.mutate()} />
+          <Button title={draft.closed ? 'Save zone and cover' : 'Close the zone to save'} disabled={!draft.closed} loading={save.isPending} onPress={() => save.mutate()} />
           {zone.data?.boundary ? (
             <Button
               title="Remove the zone"
@@ -47,7 +47,7 @@ export default function EditZone() {
         </>
       }
     >
-      <Header back title="Circle zone" subtitle="Mark the corners of the place you meet. Keep it small: one building or area." />
+      <Header back title="Circle zone" subtitle="Tap the corners of the place you meet, then tap the first corner to close it. Keep it to one building or area." />
       {zone.isLoading ? <SkeletonList rows={2} /> : <ZoneEditor ref={editor} initial={zone.data?.boundary || []} onChange={onChange} />}
       {dialog}
     </Screen>

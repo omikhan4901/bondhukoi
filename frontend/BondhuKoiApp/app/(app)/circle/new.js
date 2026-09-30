@@ -21,8 +21,8 @@ export default function NewCircle() {
   const [name, setName] = useState('');
   const [label, setLabel] = useState('');
   const [picked, setPicked] = useState(new Set());
-  const [zone, setZone] = useState([]);
-  const onZone = useCallback((p) => setZone(p), []);
+  const [zone, setZone] = useState({ points: [], closed: false });
+  const onZone = useCallback((points, closed) => setZone({ points, closed }), []);
 
   const create = useAction(
     async ({ withZone }) => {
@@ -33,7 +33,7 @@ export default function NewCircle() {
           name: name.trim(),
           ...(label.trim() ? { locationLabel: label.trim() } : {}),
           inviteeIds: [...picked],
-          ...(withZone ? { boundary: zone } : {}),
+          ...(withZone ? { boundary: zone.points } : {}),
           ...(snapshot ? { snapshotBase64: snapshot } : {}),
         },
       });
@@ -61,7 +61,7 @@ export default function NewCircle() {
     <Button key="1" title="Next" disabled={!name.trim()} onPress={() => setStep(1)} />,
     <Button key="2" title={picked.size ? `Next · ${picked.size} invited` : 'Pick at least one friend'} disabled={!picked.size} onPress={() => setStep(2)} />,
     <>
-      <Button key="3" title="Create circle" disabled={zone.length < 3} loading={create.isPending} onPress={() => create.mutate({ withZone: true })} />
+      <Button key="3" title={zone.closed ? 'Create circle' : 'Close the zone to continue'} disabled={!zone.closed} loading={create.isPending} onPress={() => create.mutate({ withZone: true })} />
       <Button key="4" title="Skip the zone for now" variant="ghost" disabled={create.isPending} onPress={() => create.mutate({ withZone: false })} />
     </>,
   ][step];
