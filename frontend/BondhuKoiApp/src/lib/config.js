@@ -7,8 +7,9 @@ export const config = {
   appVersion: Constants.expoConfig?.version || '1.0.0',
   easProjectId: Constants.expoConfig?.extra?.eas?.projectId,
   // The web build with EXPO_PUBLIC_DEMO=1 shows sample data, for design previews and
-  // store screenshots. It never talks to a server.
-  demo: process.env.EXPO_PUBLIC_DEMO === '1',
+  // store screenshots. It never talks to a server. 'signed-out' shows the welcome screens.
+  demo: process.env.EXPO_PUBLIC_DEMO === '1' || process.env.EXPO_PUBLIC_DEMO === 'signed-out',
+  demoSignedOut: process.env.EXPO_PUBLIC_DEMO === 'signed-out',
 };
 
 /** "1.2.10" > "1.2.9" */

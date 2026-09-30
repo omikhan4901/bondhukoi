@@ -28,7 +28,8 @@ export async function notify(ctx, userIds, { kind, title, body, data = {} }) {
     const messages = rows
       .filter((r) => ({ ...DEFAULT_NOTIFY, ...r.notify })[pref] !== false)
       .map((r) => ({ to: r.token, title, body, sound: 'default', data: { kind, ...data } }));
-    await ctx.push.send(messages);
+    const dead = await ctx.push.send(messages);
+    if (dead?.length) await ctx.db.exec('delete from push_tokens where token = any($1)', [dead]);
   } catch (err) {
     ctx.log.warn({ err: err.message, kind }, 'notify failed');
   }

@@ -4,6 +4,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { MessageCircle, MoreHorizontal, UserPlus, MapPin, Pencil, Trash2, LogOut, Flag, Shield, UserMinus, Radar } from 'lucide-react-native';
 import { Screen, Header, IconButton, Text, Card, Button, Section, RowGroup, ListRow, SwitchRow, Avatar, StatusPill, Sheet, Input, useConfirm, useToast, SkeletonList, ErrorState } from '../../../../src/ui';
 import { useTheme } from '../../../../src/theme/ThemeProvider';
+import { useQueryClient } from '@tanstack/react-query';
 import { useCircle, useCircleActivity, useFriends, useMe, useAction, keys } from '../../../../src/lib/queries';
 import { api } from '../../../../src/lib/api';
 import { timeAgo } from '../../../../src/lib/format';
@@ -40,6 +41,7 @@ export default function CircleScreen() {
   const { data: meData } = useMe();
   const [confirm, dialog] = useConfirm();
   const toast = useToast();
+  const client = useQueryClient();
   const [menu, setMenu] = useState(false);
   const [editing, setEditing] = useState(false);
   const [inviting, setInviting] = useState(false);
@@ -90,6 +92,7 @@ export default function CircleScreen() {
     if (!ok) return;
     try {
       await api(`/api/circles/${id}/members/${myId}`, { method: 'DELETE' });
+      await client.invalidateQueries({ queryKey: keys.circles });
       router.back();
     } catch (err) {
       toast(err.message, 'error');

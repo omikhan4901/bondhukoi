@@ -135,6 +135,7 @@ export async function demoApi(method, path, body) {
   const clean = path.split('?')[0];
   const handler = routes[`${method} ${clean}`];
   if (handler) return handler();
+  if (method === 'POST' && clean === '/api/signup-check') return { ok: true, university: 'North South University' };
   if (method === 'PATCH' && clean === '/api/me/privacy') {
     Object.assign(state.privacy, body);
     return me();

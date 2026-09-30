@@ -46,6 +46,8 @@ export function fakes(db) {
     push: {
       async send(messages) {
         pushed.push(...messages);
+        // Tokens containing "dead" behave like an uninstalled app.
+        return messages.filter((m) => m.to.includes('dead')).map((m) => m.to);
       },
     },
     authAdmin: {

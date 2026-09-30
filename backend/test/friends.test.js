@@ -162,3 +162,12 @@ test('blocking ends friendship, requests and watches, and hides people from sear
   assert.equal((await api('DELETE', `/api/blocks/${b.id}`, { user: a })).status, 200);
   assert.equal((await api('GET', '/api/users/search?q=nusrat', { user: b })).body.results.length, 1);
 });
+
+test('push tokens of uninstalled apps are forgotten', async () => {
+  const a = await createUser(ctx.db);
+  const b = await createUser(ctx.db);
+  await ctx.db.exec(`insert into push_tokens (token, user_id, platform) values ('ExponentPushToken[deadaaaaaaaa]', $1, 'android'), ('ExponentPushToken[aliveaaaaaaa]', $1, 'android')`, [b.id]);
+  await api('POST', '/api/friends/requests', { user: a, body: { userId: b.id } });
+  assert.equal(ctx.pushed.length, 2);
+  assert.deepEqual((await ctx.db.many('select token from push_tokens')).map((t) => t.token), ['ExponentPushToken[aliveaaaaaaa]']);
+});

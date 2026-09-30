@@ -26,7 +26,7 @@ const fail = (error) => {
 };
 
 export function AuthProvider({ children }) {
-  const [session, setSession] = useState(config.demo ? demoSession : null);
+  const [session, setSession] = useState(config.demo && !config.demoSignedOut ? demoSession : null);
   const [ready, setReady] = useState(config.demo);
 
   useEffect(() => {

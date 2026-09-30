@@ -8,8 +8,22 @@ separately, with a pass condition before moving on.
 **BondhuKoi has no money side.** There are no plans, credits, payments or pricing pages,
 so anything in ResumeX about those is left out.
 
-**Status:** draft, written Sep 30 2026. Update it as decisions are made (see the
-[decision log](#decision-log)).
+## Status (updated 30 Sep 2026)
+
+| Phase | State | What's left |
+|---|---|---|
+| 0. Foundations | ✅ Done | — |
+| 1. Known security holes | ✅ Done | — |
+| 2. Security architecture | ✅ Done | — |
+| 3. Hosting and operations | ✅ Built | **You:** create the projects and settings in `docs/deploy.md`. **Me:** Sentry (needs a DSN) |
+| 4. Design system and redesign | ✅ Done | Kitchen-sink dev screen |
+| 5. Finish, cut or fix features | ✅ Done | Google sign-in stays off (D2 note); offline banner |
+| 6. Admin console | ✅ Done | Alert emails (needs SMTP) |
+| 7. Testing | ✅ Automated (81 API tests, app units, fuzz, CI) | **You:** run `e2e/run.sh` on an emulator once, the real-phone checklist, the load test on staging |
+| 8. Play Store release | ✅ Prepared (`docs/release.md`, site, store listing) | **You:** Play developer account, fill `[contact email]`, closed test |
+| 9. Marketing and launch | ✅ Kit ready (`docs/marketing/`) | **You:** Facebook page, beta invites; record the videos on a phone |
+
+The decision log at the end records every choice made along the way.
 
 ---
 
