@@ -15,6 +15,7 @@ import safetyRoutes from './routes/safety.js';
 import circleRoutes from './routes/circles.js';
 import presenceRoutes from './routes/presence.js';
 import notificationRoutes from './routes/notifications.js';
+import adminRoutes from './routes/admin.js';
 
 /**
  * Builds the API. Everything it talks to (database, token check, storage, push, Supabase
@@ -109,6 +110,7 @@ export async function buildApp({ config, db, verifyToken, storage, push, authAdm
   await app.register(circleRoutes, { prefix: '/api/circles' });
   await app.register(presenceRoutes, { prefix: '/api/presence' });
   await app.register(notificationRoutes, { prefix: '/api/notifications' });
+  await app.register(adminRoutes, { prefix: '/api/admin' });
 
   return app;
 }
