@@ -50,7 +50,7 @@ export async function unregisterPushToken() {
 /** Where a tapped notification leads. */
 function routeFor(data = {}) {
   if (data.circleId) return `/circle/${data.circleId}`;
-  if (data.kind === 'friend_request') return '/(tabs)/friends';
+  if (data.kind === 'friend_request' || data.kind === 'friend_accepted') return '/friends';
   return '/notifications';
 }
 

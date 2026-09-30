@@ -51,7 +51,7 @@ export default function Onboarding() {
 
   async function finish() {
     await finishOnboarding();
-    router.replace('/(app)/(tabs)');
+    router.replace('/');
   }
   const next = (s) => (single ? finish() : setStep(s));
 
