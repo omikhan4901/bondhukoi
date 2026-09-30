@@ -94,3 +94,20 @@ test('oversized bodies are refused', async () => {
   const res = await api('POST', '/api/feedback', { user: a, body: { message: 'x'.repeat(300 * 1024) } });
   assert.equal(res.status, 413);
 });
+
+test('sign-up check explains what is wrong without using up invites', async () => {
+  const check = (body) => api('POST', '/api/signup-check', { body });
+  assert.deepEqual((await check({ email: 'a@northsouth.edu' })).body, { ok: true, university: 'North South University' });
+  assert.equal((await check({ email: 'a@gmail.com' })).body.reason, 'domain');
+  assert.equal((await check({ email: 'not-an-email' })).status, 400);
+  await ctx.db.exec(`update app_settings set value = '{"open": true, "invitesRequired": true}' where key = 'signups'`);
+  await ctx.db.exec(`insert into invite_codes (code, max_uses) values ('BK-ABCDEF', 1)`);
+  ctx.app.ctx.settings.invalidate();
+  assert.equal((await check({ email: 'a@northsouth.edu' })).body.reason, 'invite');
+  assert.equal((await check({ email: 'a@northsouth.edu', inviteCode: 'bk-abcdef' })).body.ok, true);
+  assert.equal((await ctx.db.one(`select uses from invite_codes`)).uses, 0);
+  await ctx.db.exec(`update app_settings set value = '{"open": false, "invitesRequired": false}' where key = 'signups'`);
+  ctx.app.ctx.settings.invalidate();
+  assert.equal((await check({ email: 'a@northsouth.edu' })).body.reason, 'closed');
+  ctx.app.ctx.settings.invalidate();
+});
