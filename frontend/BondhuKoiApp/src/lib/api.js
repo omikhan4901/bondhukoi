@@ -35,6 +35,10 @@ async function send(path, method, body, token) {
  */
 export async function api(path, { method = 'GET', body } = {}) {
   if (config.demo) return demoApi(method, path, body);
+  // Release builds only ever talk to the API over HTTPS.
+  if (!__DEV__ && !config.apiUrl.startsWith('https://')) {
+    throw new ApiError('This version of BondhuKoi is set up wrongly. Please update it.', { code: 'insecure_build' });
+  }
   const {
     data: { session },
   } = await supabase.auth.getSession();
