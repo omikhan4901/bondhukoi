@@ -4,8 +4,10 @@ import { buildApp } from './app.js';
 import { createTokenVerifier } from './adapters/tokens.js';
 import { createSupabaseAdapters } from './adapters/supabase.js';
 import { createExpoPush } from './adapters/push.js';
+import { initSentry } from './adapters/sentry.js';
 
 const config = loadConfig();
+const sentry = initSentry(config.sentryDsn, config.production ? 'production' : 'development');
 const db = createDb({ connectionString: config.databaseUrl, ssl: config.databaseSsl });
 const { storage, authAdmin } = createSupabaseAdapters(config);
 
@@ -17,6 +19,7 @@ const app = await buildApp({
   storage,
   authAdmin,
   push: { send: (messages) => push.send(messages) },
+  sentry,
 });
 push = createExpoPush({ accessToken: config.expoAccessToken, log: app.log });
 

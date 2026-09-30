@@ -22,7 +22,7 @@ import internalRoutes from './routes/internal.js';
  * Builds the API. Everything it talks to (database, token check, storage, push, Supabase
  * Auth admin) is passed in, so tests run the real routes against a test database and fakes.
  */
-export async function buildApp({ config, db, verifyToken, storage, push, authAdmin, logger = true }) {
+export async function buildApp({ config, db, verifyToken, storage, push, authAdmin, sentry = null, logger = true }) {
   const app = Fastify({
     logger:
       logger === true
@@ -90,6 +90,7 @@ export async function buildApp({ config, db, verifyToken, storage, push, authAdm
       return reply.status(err.statusCode).send({ statusCode: err.statusCode, code: 'bad_request', error: 'That request could not be read.' });
     }
     req.log.error({ err }, 'request failed');
+    sentry?.captureException(err, { tags: { route: req.routeOptions?.url, method: req.method } });
     return reply.status(500).send({ statusCode: 500, code: 'server_error', error: 'Something went wrong. Please try again.', requestId: req.id });
   });
 

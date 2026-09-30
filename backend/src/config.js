@@ -27,6 +27,7 @@ export function loadConfig(env = process.env) {
     logLevel: env.LOG_LEVEL || (production ? 'info' : 'debug'),
     trustProxy: env.TRUST_PROXY !== 'false',
     expoAccessToken: env.EXPO_ACCESS_TOKEN || '',
+    sentryDsn: env.SENTRY_DSN || '',
     // Daily admin alert emails (optional): see routes/internal.js.
     alertsSecret: env.ALERTS_SECRET || '',
     resendApiKey: env.RESEND_API_KEY || '',

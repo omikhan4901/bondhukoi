@@ -1,4 +1,5 @@
 import '../src/location/location'; // defines the background task before anything else runs
+import { initSentry } from '../src/lib/sentry';
 import { useEffect } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -12,6 +13,7 @@ import { AuthProvider, useAuth } from '../src/auth/AuthProvider';
 import { queryClient } from '../src/lib/queries';
 import { ToastProvider } from '../src/ui';
 
+initSentry();
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
 function Root() {
