@@ -1,0 +1,29 @@
+appId: com.omi.bondhukoi
+name: Create a circle and draw its zone (the cover picture comes from the map)
+---
+- launchApp
+- tapOn: "Circles"
+- tapOn: "New circle"
+- tapOn: "e.g. Thesis group"
+- inputText: "Maestro circle"
+- tapOn: "Next"
+- tapOn: ${B_NAME}
+- tapOn: "Next · 1 invited"
+# Four corners around the map's centre, then the first corner again to close.
+- tapOn:
+    point: "30%,30%"
+- tapOn:
+    point: "70%,30%"
+- tapOn:
+    point: "70%,55%"
+- tapOn:
+    point: "30%,55%"
+- assertVisible: "4 corners. Tap the green corner to close the zone."
+- tapOn:
+    point: "30%,30%"
+- assertVisible: "Zone closed · 4 corners.*"
+- tapOn: "Create circle"
+- extendedWaitUntil:
+    visible: "Maestro circle"
+    timeout: 20000
+- assertVisible: "Members · 1"

@@ -1,0 +1,14 @@
+appId: com.omi.bondhukoi
+name: Delete the account (last, it signs out)
+---
+- launchApp
+- tapOn: "You"
+- scrollUntilVisible:
+    element: "Delete account"
+- tapOn: "Delete account"
+- tapOn: "Type DELETE to confirm"
+- inputText: "DELETE"
+- tapOn: "Delete my account"
+- extendedWaitUntil:
+    visible: "See which friends are on campus."
+    timeout: 15000

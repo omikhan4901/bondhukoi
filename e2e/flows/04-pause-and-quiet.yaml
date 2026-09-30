@@ -1,0 +1,11 @@
+appId: com.omi.bondhukoi
+name: Pausing shows "Sharing paused" and resuming restores it
+---
+- launchApp
+- tapOn: "Home"
+- tapOn: "Pause sharing"
+- assertVisible: "Sharing paused"
+- assertVisible: "Nobody can see where you are."
+- runScript: ../scripts/assert-friend-sees-off.js
+- tapOn: "Resume sharing"
+- assertVisible: "Sharing is on again."

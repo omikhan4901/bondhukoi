@@ -1,0 +1,13 @@
+# Maestro end-to-end flows for the Android app. See docs/testing.md.
+flows:
+  - "*.yaml"
+executionOrder:
+  continueOnFailure: false
+  flowsOrder:
+    - 01-sign-in
+    - 02-add-friend
+    - 03-arrive-on-campus
+    - 04-pause-and-quiet
+    - 05-circle-with-zone
+    - 06-privacy-screens
+    - 07-delete-account

@@ -1,0 +1,15 @@
+appId: com.omi.bondhukoi
+name: Send a friend request by code (B accepts through the API in run.sh)
+---
+- launchApp
+- tapOn: "Friends"
+- tapOn: "Add a friend"
+- tapOn: "e.g. NJ4K 7QX2"
+- inputText: ${B_CODE}
+- tapOn: "Send request"
+- assertVisible: "Request sent."
+- runScript: ../scripts/accept-request.js
+- back
+- tapOn: "Friends"
+- scroll
+- assertVisible: ${B_NAME}

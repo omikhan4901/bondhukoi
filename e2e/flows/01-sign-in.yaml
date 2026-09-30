@@ -1,0 +1,18 @@
+appId: com.omi.bondhukoi
+name: Sign in as the first test student
+env:
+  EMAIL: ${A_EMAIL}
+  PASSWORD: ${A_PASSWORD}
+---
+- clearState
+- launchApp
+- assertVisible: "See which friends are on campus."
+- tapOn: "I already have an account"
+- tapOn: "University email"
+- inputText: ${EMAIL}
+- tapOn: "Password"
+- inputText: ${PASSWORD}
+- tapOn: "Sign in"
+- extendedWaitUntil:
+    visible: "Hi, .*"
+    timeout: 15000

@@ -1,0 +1,22 @@
+appId: com.omi.bondhukoi
+name: Arriving on campus updates the friend's view
+---
+# Off campus first (Savar), then inside the NSU zone.
+- setLocation:
+    latitude: 23.7808
+    longitude: 90.2792
+- launchApp
+- tapOn: "Home"
+- swipe:
+    direction: DOWN
+- setLocation:
+    latitude: 23.8151
+    longitude: 90.4255
+- swipe:
+    direction: DOWN
+- extendedWaitUntil:
+    visible: "On campus"
+    timeout: 20000
+# B checked in from campus too (run.sh), so A sees B there.
+- assertVisible: "On campus now · 1"
+- assertVisible: ${B_NAME}

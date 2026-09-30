@@ -1,0 +1,13 @@
+appId: com.omi.bondhukoi
+name: Who can see me lists friends and circles
+---
+- launchApp
+- tapOn: "You"
+- tapOn: "Who can see me"
+- assertVisible: "Friends · 1"
+- assertVisible: ${B_NAME}
+- assertVisible: "Circles · 1"
+- back
+- tapOn: "Sharing and quiet hours"
+- assertVisible: "Quiet hours"
+- assertVisible: "6 PM"
