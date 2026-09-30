@@ -17,6 +17,12 @@ create table if not exists auth.users (
   created_at timestamptz not null default now()
 );
 
+create table if not exists auth.sessions (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  created_at timestamptz not null default now()
+);
+
 -- Supabase grants anon and authenticated access to public by default; mimic that so the
 -- lock-down in the baseline migration is actually tested.
 grant usage on schema public to anon, authenticated;

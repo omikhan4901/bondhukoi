@@ -1,286 +1,161 @@
-import { 
-  getUserByEmail,
-  getUserByFriendCode,
-  createFriendRequest, 
-  getPendingFriendRequests, 
-  updateFriendRequest, 
-  deleteFriendRequest,
-  getFriends,
-  deleteFriendship,
-  getWatchedFriends,
-  createWatchRequest,
-  getPendingWatchRequests,
-  updateWatchRequest,
-  deleteWatchRequest
-} from '../db/database.js';
+import { limit } from '../lib/limits.js';
+import { body, idParams, uuid, friendCode } from '../lib/schemas.js';
+import { badRequest, conflict, notFound } from '../lib/errors.js';
+import { card, friendCard, CARD_COLUMNS, pair, areFriends, isBlockedEitherWay, logEvent } from '../lib/people.js';
+import { PRESENCE_COLUMNS, describePresence, sharedDetectableCircles } from '../lib/visibility.js';
+import { notify } from '../lib/notify.js';
 
-export default async function friendRoutes(fastify) {
-  // Send friend request
-  fastify.post('/requests', async (request, reply) => {
-    try {
-      await request.jwtVerify();
-      const { friendEmail, friendCode } = request.body;
+const MAX_PENDING_OUT = 50;
 
-      if (!friendEmail && !friendCode) {
-        return reply.status(400).send({
-          error: 'friendEmail or friendCode is required',
-        });
-      }
+export default async function friendRoutes(app) {
+  const { db, settings, storage } = app.ctx;
+  const ctx = app.ctx;
+  const { requireUser } = ctx.auth;
+  app.addHook('onRequest', requireUser);
 
-      let friendUser;
-      if (friendCode) {
-        friendUser = await getUserByFriendCode(friendCode);
-      } else {
-        friendUser = await getUserByEmail(friendEmail);
-      }
-
-      if (!friendUser) {
-        return reply.status(404).send({
-          error: 'User not found',
-        });
-      }
-
-      // Prevent adding yourself
-      if (friendUser.id === request.user.userId) {
-        return reply.status(400).send({
-          error: 'Cannot add yourself as a friend',
-        });
-      }
-
-      const friendRequest = await createFriendRequest(request.user.userId, friendUser.id);
-
-      reply.status(201).send({
-        message: 'Friend request sent',
-        request: friendRequest,
-      });
-    } catch (err) {
-      fastify.log.error(err);
-      reply.status(500).send({
-        error: 'Failed to send friend request',
-        message: err.message,
-      });
-    }
+  /** Your friends, each with what you're allowed to know about where they are. */
+  app.get('/', { config: limit('read', settings) }, async (req) => {
+    const me = req.user.id;
+    const rows = await db.many(
+      `select ${CARD_COLUMNS}, ${PRESENCE_COLUMNS}, f.created_at as friends_since,
+              w.id as watch_id, w.status as watch_status, w.scope as watch_scope
+         from friendships f
+         join profiles p on p.id = case when f.user_a = $1 then f.user_b else f.user_a end
+         join universities u on u.id = p.university_id
+         left join presence pr on pr.user_id = p.id
+         left join watches w on w.watcher_id = $1 and w.watched_id = p.id
+        where (f.user_a = $1 or f.user_b = $1)
+        order by p.name`,
+      [me],
+    );
+    const circles = await sharedDetectableCircles(db, me, rows.map((r) => r.id));
+    const now = new Date();
+    return {
+      friends: rows.map((r) => ({
+        ...friendCard(r, storage),
+        presence: describePresence(r, circles.get(r.id), now),
+        watch: r.watch_id ? { id: r.watch_id, status: r.watch_status, scope: r.watch_scope } : null,
+        friendsSince: r.friends_since,
+      })),
+    };
   });
 
-  // Get pending friend requests
-  fastify.get('/requests/pending', async (request, reply) => {
-    try {
-      await request.jwtVerify();
-
-      const pendingRequests = await getPendingFriendRequests(request.user.userId);
-
-      reply.send({
-        requests: pendingRequests,
-        count: pendingRequests.length,
-      });
-    } catch (err) {
-      fastify.log.error(err);
-      reply.status(500).send({
-        error: 'Failed to fetch friend requests',
-      });
-    }
+  app.delete('/:userId', { config: limit('write', settings), schema: { params: idParams('userId') } }, async (req) => {
+    const [a, b] = pair(req.user.id, req.params.userId);
+    const removed = await db.tx(async (tx) => {
+      const n = await tx.exec('delete from friendships where user_a = $1 and user_b = $2', [a, b]);
+      // Watches only make sense between friends.
+      await tx.exec(
+        'delete from watches where (watcher_id = $1 and watched_id = $2) or (watcher_id = $2 and watched_id = $1)',
+        [a, b],
+      );
+      return n;
+    });
+    if (!removed) throw notFound('You aren’t friends with this person.');
+    await logEvent(db, req.user.id, 'unfriended');
+    return { ok: true };
   });
 
-  // Accept friend request
-  fastify.patch('/requests/:requestId/accept', async (request, reply) => {
-    try {
-      await request.jwtVerify();
-      
-      const friendRequest = await updateFriendRequest(request.params.requestId, 'accepted');
+  app.get('/requests', { config: limit('read', settings) }, async (req) => {
+    const me = req.user.id;
+    const [incoming, outgoing] = await Promise.all([
+      db.many(
+        `select r.id as request_id, r.created_at, ${CARD_COLUMNS}
+           from friend_requests r join profiles p on p.id = r.from_user_id join universities u on u.id = p.university_id
+          where r.to_user_id = $1 and p.status = 'active' order by r.created_at desc`,
+        [me],
+      ),
+      db.many(
+        `select r.id as request_id, r.created_at, ${CARD_COLUMNS}
+           from friend_requests r join profiles p on p.id = r.to_user_id join universities u on u.id = p.university_id
+          where r.from_user_id = $1 order by r.created_at desc`,
+        [me],
+      ),
+    ]);
+    const shape = (r) => ({ id: r.request_id, createdAt: r.created_at, user: card(r, storage) });
+    return { incoming: incoming.map(shape), outgoing: outgoing.map(shape) };
+  });
 
-      if (!friendRequest) {
-        return reply.status(404).send({
-          error: 'Friend request not found',
-        });
+  /**
+   * Sends a request by user id or friend code. If they already asked you, this accepts
+   * theirs instead. Blocked pairs get the same "not found" as a wrong code.
+   */
+  app.post(
+    '/requests',
+    {
+      config: limit('friendRequest', settings),
+      schema: { body: { ...body({ userId: uuid, friendCode }), oneOf: [{ required: ['userId'] }, { required: ['friendCode'] }] } },
+    },
+    async (req, reply) => {
+      const me = req.user.id;
+      const target = req.body.userId
+        ? await db.one(`select id, name from profiles where id = $1 and status = 'active'`, [req.body.userId])
+        : await db.one(`select id, name from profiles where friend_code = $1 and status = 'active'`, [req.body.friendCode.toUpperCase()]);
+      if (!target || (await isBlockedEitherWay(db, me, target.id))) throw notFound('No one found with that code.');
+      if (target.id === me) throw badRequest('That’s your own code.', 'self');
+      if (await areFriends(db, me, target.id)) throw conflict('You’re already friends.', 'already_friends');
+
+      const reverse = await db.one('select id from friend_requests where from_user_id = $1 and to_user_id = $2', [target.id, me]);
+      if (reverse) {
+        await acceptRequest(reverse.id, me);
+        return reply.status(200).send({ status: 'friends' });
       }
 
-      reply.send({
-        message: 'Friend request accepted',
-      });
-    } catch (err) {
-      fastify.log.error(err);
-      reply.status(500).send({
-        error: 'Failed to accept friend request',
-      });
-    }
-  });
+      const pending = await db.one('select count(*) as n from friend_requests where from_user_id = $1', [me]);
+      if (pending.n >= MAX_PENDING_OUT) throw conflict('You have too many requests waiting. Cancel some first.', 'too_many_pending');
 
-  // Reject friend request
-  fastify.delete('/requests/:requestId', async (request, reply) => {
-    try {
-      await request.jwtVerify();
-
-      await deleteFriendRequest(request.params.requestId);
-
-      reply.send({
-        message: 'Friend request rejected',
-      });
-    } catch (err) {
-      fastify.log.error(err);
-      reply.status(500).send({
-        error: 'Failed to reject friend request',
-      });
-    }
-  });
-
-  // Get friends list with pagination
-  fastify.get('/list', async (request, reply) => {
-    try {
-      await request.jwtVerify();
-      const { limit = 50, offset = 0 } = request.query;
-
-      const { data: friends, total, hasMore } = await getFriends(request.user.userId, { 
-        limit: parseInt(limit), 
-        offset: parseInt(offset) 
-      });
-
-      const mappedFriends = friends.map(f => ({
-        id: f.id,
-        name: f.name,
-        email: f.email,
-        university: f.university,
-        facebook: f.facebook || null,
-        instagram: f.instagram || null,
-        avatarUrl: f.avatar_url || null,
-      }));
-
-      reply.send({
-        friends: mappedFriends,
-        total,
-        hasMore,
-        count: mappedFriends.length,
-      });
-    } catch (err) {
-      fastify.log.error(err);
-      reply.status(500).send({
-        error: 'Failed to fetch friends',
-      });
-    }
-  });
-
-  // Unfriend a friend
-  fastify.delete('/:friendId', async (request, reply) => {
-    try {
-      await request.jwtVerify();
-
-      const { friendId } = request.params;
-
-      if (!friendId) {
-        return reply.status(400).send({
-          error: 'friendId is required',
+      const created = await db.one(
+        `insert into friend_requests (from_user_id, to_user_id) values ($1, $2)
+         on conflict (from_user_id, to_user_id) do nothing returning id`,
+        [me, target.id],
+      );
+      if (created) {
+        await logEvent(db, me, 'friend_request_sent');
+        await notify(ctx, [target.id], {
+          kind: 'friend_request',
+          title: 'New friend request',
+          body: `${req.user.name} wants to be friends.`,
+          data: { requestId: created.id },
         });
       }
+      return reply.status(201).send({ status: 'requested' });
+    },
+  );
 
-      await deleteFriendship(request.user.userId, friendId);
+  async function acceptRequest(requestId, me) {
+    const request = await db.tx(async (tx) => {
+      const r = await tx.one('delete from friend_requests where id = $1 and to_user_id = $2 returning from_user_id', [requestId, me]);
+      if (!r) return null;
+      if (await isBlockedEitherWay(tx, me, r.from_user_id)) return null;
+      const [a, b] = pair(me, r.from_user_id);
+      await tx.exec('insert into friendships (user_a, user_b) values ($1, $2) on conflict do nothing', [a, b]);
+      await tx.exec('delete from friend_requests where from_user_id = $1 and to_user_id = $2', [me, r.from_user_id]);
+      return r;
+    });
+    if (!request) throw notFound('That request is no longer waiting.');
+    await logEvent(db, me, 'friend_added');
+    const accepter = await db.one('select name from profiles where id = $1', [me]);
+    await notify(ctx, [request.from_user_id], {
+      kind: 'friend_accepted',
+      title: 'Friend request accepted',
+      body: `You and ${accepter.name} are now friends.`,
+      data: { userId: me },
+    });
+  }
 
-      reply.send({
-        message: 'Friend removed',
-      });
-    } catch (err) {
-      fastify.log.error(err);
-      reply.status(500).send({
-        error: 'Failed to remove friend',
-        message: err.message,
-      });
-    }
+  // Only the person the request was sent to can accept it.
+  app.post('/requests/:requestId/accept', { config: limit('write', settings), schema: { params: idParams('requestId') } }, async (req) => {
+    await acceptRequest(req.params.requestId, req.user.id);
+    return { status: 'friends' };
   });
 
-  // Set up watch request (priority alerts)
-  fastify.post('/watch', async (request, reply) => {
-    try {
-      await request.jwtVerify();
-      const { friendEmail, scope } = request.body;
-
-      if (!friendEmail || !scope) {
-        return reply.status(400).send({
-          error: 'friendEmail and scope are required',
-        });
-      }
-
-      const friendUser = await getUserByEmail(friendEmail);
-      if (!friendUser) {
-        return reply.status(404).send({
-          error: 'User not found',
-        });
-      }
-
-      const watchRequest = await createWatchRequest(request.user.userId, friendUser.id, scope);
-
-      reply.status(201).send({
-        message: 'Watch request sent',
-        watch: watchRequest,
-      });
-    } catch (err) {
-      if (err.code === 'DUPLICATE_WATCH') {
-        return reply.status(409).send({
-          error: 'Already watching this friend',
-          message: 'You are already watching this friend. Remove the existing watch before setting up a new one.',
-        });
-      }
-      fastify.log.error(err);
-      reply.status(500).send({
-        error: 'Failed to send watch request',
-        message: err.message,
-      });
-    }
-  });
-
-  // Accept watch request
-  fastify.patch('/watch/:watchId/accept', async (request, reply) => {
-    try {
-      await request.jwtVerify();
-      const watch = await updateWatchRequest(request.params.watchId, 'accepted');
-
-      if (!watch) {
-        return reply.status(404).send({
-          error: 'Watch request not found',
-        });
-      }
-
-      reply.send({
-        message: 'Watch request accepted',
-      });
-    } catch (err) {
-      fastify.log.error(err);
-      reply.status(500).send({
-        error: 'Failed to accept watch request',
-      });
-    }
-  });
-
-  // Remove watch
-  fastify.delete('/watch/:watchId', async (request, reply) => {
-    try {
-      await request.jwtVerify();
-      
-      await deleteWatchRequest(request.params.watchId);
-
-      reply.send({
-        message: 'Watch removed',
-      });
-    } catch (err) {
-      fastify.log.error(err);
-      reply.status(500).send({
-        error: 'Failed to remove watch',
-      });
-    }
-  });
-
-  // Get watch list
-  fastify.get('/watch/list', async (request, reply) => {
-    try {
-      await request.jwtVerify();
-
-      const watches = await getWatchedFriends(request.user.userId);
-
-      reply.send({
-        watches: watches || [],
-        count: (watches || []).length,
-      });
-    } catch (err) {
-      reply.status(401).send({
-        error: 'Unauthorized',
-      });
-    }
+  // The receiver declines, or the sender cancels.
+  app.delete('/requests/:requestId', { config: limit('write', settings), schema: { params: idParams('requestId') } }, async (req) => {
+    const n = await db.exec('delete from friend_requests where id = $1 and (from_user_id = $2 or to_user_id = $2)', [
+      req.params.requestId,
+      req.user.id,
+    ]);
+    if (!n) throw notFound('That request is no longer waiting.');
+    return { ok: true };
   });
 }
