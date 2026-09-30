@@ -26,10 +26,10 @@ colour. These rules replace the old "Digital Sanctuary" and "Midnight Sanctuary"
 |---|---|---|---|
 | `brand` | `#C2410C` | `#FB923C` | Primary buttons, links, active tab |
 | `brandPressed` | `#9A3412` | `#FDBA74` | Pressed primary |
-| `brandSoft` | `#FFF4EE` | `#431407` | Icon tiles, selected rows |
+| `brandSoft` | `#FFF4EE` | `#2A1508` | Icon tiles, selected rows |
 | `brandLine` | `#FFE4D5` | `#7C2D12` | Icon tile borders |
 | `ink` | `#0F172A` | `#F1F5F9` | Headings and body text |
-| `muted` | `#64748B` | `#94A3B8` | Secondary text |
+| `muted` | `#5B6B7F` | `#94A3B8` | Secondary text |
 | `page` | `#F8FAFC` | `#0B1220` | Screen background |
 | `surface` | `#FFFFFF` | `#111A2E` | Cards, sheets, inputs |
 | `line` | `#E2E8F0` | `#1E293B` | Borders |
@@ -39,7 +39,7 @@ colour. These rules replace the old "Digital Sanctuary" and "Midnight Sanctuary"
 | `paused` | `#B45309` | `#FBBF24` | "Sharing paused" |
 | `danger` | `#DC2626` | `#F87171` | Destructive actions only |
 
-White text on `brand` is 5.2:1 and `muted` on white is 4.8:1 (both pass WCAG AA). A test
+White text on `brand` is 5.2:1 and `muted` is at least 4.9:1 on every light surface (both pass WCAG AA). A test
 checks every text/background pair used by the kit.
 
 - **Spacing:** 4, 8, 12, 16, 24, 32. Screen side padding 16 (20 on wide phones).

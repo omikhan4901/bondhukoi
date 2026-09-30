@@ -1,75 +1,80 @@
+const LOCATION_WHY =
+  'BondhuKoi checks whether you are inside your campus or your circles’ zones, so the friends you choose can see “On campus”. Your exact location is never stored or shown to anyone.';
+
 export default {
   expo: {
-    name: "BondhuKoi",
-    slug: "BondhuKoiApp",
-    version: "1.0.0",
-    scheme: "bondhukoi",
+    name: 'BondhuKoi',
+    slug: 'bondhukoi',
+    scheme: 'bondhukoi',
+    version: '1.0.0',
+    runtimeVersion: { policy: 'appVersion' },
+    orientation: 'portrait',
+    icon: './assets/icon.png',
+    userInterfaceStyle: 'automatic',
     newArchEnabled: true,
-
-    // 🔴 Replace with your actual icon/splash paths
-    icon: "./assets/icon.png",
     splash: {
-      image: "./assets/splash-icon.png",
-      resizeMode: "contain",
-      backgroundColor: "#111317",
+      image: './assets/splash-icon.png',
+      resizeMode: 'contain',
+      backgroundColor: '#F8FAFC',
+      dark: { backgroundColor: '#0B1220' },
     },
-
-    // Required for EAS OTA updates
-    runtimeVersion: {
-      policy: "appVersion",
-    },
-
-    userInterfaceStyle: "automatic",
-
     ios: {
-      bundleIdentifier: "com.omi.bondhukoi",
+      bundleIdentifier: 'com.omi.bondhukoi',
+      supportsTablet: false,
       infoPlist: {
-        NSLocationWhenInUseUsageDescription:
-          "BondhuKoi needs your location to check if you're inside your university or circle zones.",
-        NSLocationAlwaysAndWhenInUseUsageDescription:
-          "BondhuKoi needs background location to notify your circle when you enter or leave zones.",
-        NSLocationAlwaysUsageDescription:
-          "BondhuKoi needs background location to notify your circle when you enter or leave zones.",
+        NSLocationWhenInUseUsageDescription: LOCATION_WHY,
+        NSLocationAlwaysAndWhenInUseUsageDescription: LOCATION_WHY,
+        NSCameraUsageDescription: 'Scan a friend’s BondhuKoi QR code to add them.',
+        NSPhotoLibraryUsageDescription: 'Choose a profile photo.',
+        UIBackgroundModes: ['location'],
       },
     },
-
     android: {
-      package: "com.omi.bondhukoi",
+      package: 'com.omi.bondhukoi',
       versionCode: 1,
-      compileSdkVersion: 35,
-      targetSdkVersion: 35,
-      buildToolsVersion: "35.0.0",
       adaptiveIcon: {
-        foregroundImage: "./assets/android-icon-foreground.png",
-        backgroundImage: "./assets/android-icon-background.png",
-        monochromeImage: "./assets/android-icon-monochrome.png",
+        foregroundImage: './assets/android-icon-foreground.png',
+        backgroundImage: './assets/android-icon-background.png',
+        monochromeImage: './assets/android-icon-monochrome.png',
       },
       config: {
-        googleMaps: {
-          // ✅ Key is read from .env — never hardcoded here
-          apiKey: process.env.GOOGLE_MAPS_API_KEY,
-        },
+        // Restricted in Google Cloud to this package and the signing certificate.
+        googleMaps: { apiKey: process.env.GOOGLE_MAPS_API_KEY },
       },
       permissions: [
-        "ACCESS_COARSE_LOCATION",
-        "ACCESS_FINE_LOCATION",
-        "ACCESS_BACKGROUND_LOCATION",
-        "FOREGROUND_SERVICE",
-        "FOREGROUND_SERVICE_LOCATION",
+        'ACCESS_COARSE_LOCATION',
+        'ACCESS_FINE_LOCATION',
+        'ACCESS_BACKGROUND_LOCATION',
+        'FOREGROUND_SERVICE',
+        'FOREGROUND_SERVICE_LOCATION',
+        'POST_NOTIFICATIONS',
+        'CAMERA',
       ],
+      blockedPermissions: ['android.permission.RECORD_AUDIO', 'android.permission.READ_CONTACTS'],
+      allowBackup: false,
     },
-
+    web: { favicon: './assets/favicon.png', bundler: 'metro', output: 'single' },
     plugins: [
-      "expo-router",
+      'expo-router',
+      'expo-secure-store',
+      'expo-font',
       [
-        "expo-location",
+        'expo-location',
         {
-          locationAlwaysAndWhenInUsePermission:
-            "BondhuKoi needs location access to check when you enter or leave your university or circle zones.",
-          isAndroidBackgroundEnabled: true,
+          locationAlwaysAndWhenInUsePermission: LOCATION_WHY,
+          locationWhenInUsePermission: LOCATION_WHY,
+          isAndroidBackgroundLocationEnabled: true,
+          isAndroidForegroundServiceEnabled: false,
         },
       ],
-      "expo-web-browser",
+      ['expo-notifications', { color: '#C2410C' }],
+      ['expo-camera', { cameraPermission: 'Scan a friend’s BondhuKoi QR code to add them.', recordAudioAndroid: false }],
+      ['expo-image-picker', { photosPermission: 'Choose a profile photo.', cameraPermission: false, microphonePermission: false }],
+      ['expo-splash-screen', { image: './assets/splash-icon.png', imageWidth: 160, backgroundColor: '#F8FAFC', dark: { backgroundColor: '#0B1220' } }],
     ],
+    experiments: { typedRoutes: false },
+    extra: {
+      eas: { projectId: process.env.EAS_PROJECT_ID },
+    },
   },
 };

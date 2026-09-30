@@ -37,6 +37,26 @@ jobs:
       - run: npm test
       - run: npm audit --omit=dev --audit-level=high
 
+  app:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend/BondhuKoiApp
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/BondhuKoiApp/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test -- --ci
+      - name: The app bundles (web build catches import and syntax errors)
+        run: npx expo export --platform web --output-dir /tmp/web
+        env:
+          EXPO_PUBLIC_DEMO: '1'
+
   secrets:
     runs-on: ubuntu-latest
     steps:
