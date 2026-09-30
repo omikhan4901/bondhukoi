@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="/style.css"><link rel="icon" href="/favicon.svg">
+<title>Privacy policy · BondhuKoi</title>
+</head>
+<body>
+<header class="top"><div class="wrap"><a class="logo" href="/"><svg width="32" height="32" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="11" fill="#c2410c"/><circle cx="16.5" cy="18" r="3.2" fill="#fff"/><circle cx="23.5" cy="18" r="3.2" fill="#fff"/><path d="M11.8 26.4c1-2.6 2.8-4 4.7-4s3.2 1 3.5 2.4c.3-1.4 1.6-2.4 3.5-2.4s3.7 1.4 4.7 4" stroke="#fff" stroke-width="2.2" stroke-linecap="round" fill="none"/></svg><span>Bondhu<b>Koi</b></span></a><nav><a href="/#privacy">Privacy</a><a href="/#how">How it works</a><a href="https://github.com/omikhan4901/bondhukoi">Code</a></nav></div></header>
+<main class="doc">
+<!-- BEFORE LAUNCH: replace [contact email] everywhere on this site, and have this page reviewed. -->
+<h1>Privacy policy</h1>
+<p class="muted">Last updated 1 October 2026</p>
+<p>BondhuKoi shows university students which of their friends are on campus, or in a place they share, without showing anyone’s location. This page explains exactly what we collect, why, and what you can do about it. We wrote it to match how the app actually works; the code is public at <a href="https://github.com/omikhan4901/bondhukoi">github.com/omikhan4901/bondhukoi</a>.</p>
+
+<h2>The short version</h2>
+<ul>
+  <li><strong>Your location is never stored.</strong> Your phone sends a location reading when you cross the edge of a zone (your campus or a circle’s place) or open the app. Our server uses it to answer “inside or not?”, stores only that answer, and discards the reading.</li>
+  <li>Only people you accept can see anything: friends, members of circles you join, and people you allow to get arrival alerts.</li>
+  <li>Nobody, including BondhuKoi’s admins, can see where you are or were.</li>
+  <li>You can pause sharing, set quiet hours, block people and delete your account at any time.</li>
+</ul>
+
+<h2>What we collect</h2>
+<table>
+<tr><th>Data</th><th>Why</th><th>Kept</th></tr>
+<tr><td>University email address and password</td><td>Your account; the email proves you’re a student of your university. Passwords are handled by Supabase Auth and stored only as a secure hash.</td><td>Until you delete your account</td></tr>
+<tr><td>Name, optional photo, optional Facebook and Instagram usernames</td><td>So friends recognise you. Social links are shown only to friends. Photos are re-encoded and all metadata (including location tags) removed.</td><td>Until you change or delete them</td></tr>
+<tr><td>Approximate and precise location readings (including in the background, if you allow it)</td><td>To work out whether you’re on campus or in a circle’s place. Collected only when you cross a zone edge or open the app.</td><td><strong>Not stored.</strong> Used once and discarded.</td></tr>
+<tr><td>Your current status: on campus or not, and which of your circles’ places you’re in</td><td>To show the people you allow.</td><td>Replaced at each check; cleared after 12 hours without one</td></tr>
+<tr><td>Arrivals and departures (for example “arrived on campus at 9:10”)</td><td>Arrival alerts for people you allow, and a circle’s “Today” list.</td><td>24 hours by default, or 30 days if you choose</td></tr>
+<tr><td>Friends, requests, circles, alert permissions, blocks</td><td>How the app works.</td><td>Until you or the other person remove them</td></tr>
+<tr><td>Reports and feedback you send</td><td>To keep people safe and improve the app.</td><td>Until handled, then up to 1 year</td></tr>
+<tr><td>Push notification token, app version, device type</td><td>To send notifications you turned on.</td><td>Until you sign out or delete your account</td></tr>
+<tr><td>A record of account actions (for example “joined a circle”, never locations)</td><td>Safety and abuse prevention.</td><td>Until you delete your account</td></tr>
+<tr><td>Technical logs (time, request, IP address, error details)</td><td>Security and fixing problems. Logs never include locations or passwords.</td><td>Up to 30 days</td></tr>
+</table>
+<p>We don’t sell data, show ads, or use your data to train AI.</p>
+
+<h2>Who can see what</h2>
+<ul>
+  <li><strong>Friends</strong> see your name, photo, social links, and “on campus”, “away”, or the circles you share, if you share them.</li>
+  <li><strong>Circle members</strong> see your name and photo, and whether you’re in that circle’s place right now (unless you turn that off for the circle).</li>
+  <li><strong>People you allow to get alerts</strong> get a notification when you arrive at or leave campus (and, if you allowed it, circles you share).</li>
+  <li><strong>Anyone at your university</strong> can find you by name to send a friend request. Anyone with your friend code can too.</li>
+  <li><strong>BondhuKoi admins</strong> can see account details, reports and feedback to keep the service safe. They cannot see your location, status or history.</li>
+</ul>
+<p>When sharing is paused, during quiet hours, or if your account is suspended, everyone sees only “Not sharing”.</p>
+
+<h2>Services we use</h2>
+<p>Supabase (database, sign-in and file storage, hosted in Mumbai, India), Google Cloud Run (the API, Mumbai), Expo (push notifications), our email provider (sign-in codes only), Google Maps (the map when you draw a circle’s place) and Cloudflare (this website and the admin console). They process data only to provide their service to us.</p>
+
+<h2>Your choices and rights</h2>
+<ul>
+  <li>Pause sharing, turn off campus sharing, set quiet hours, turn off detection per circle, or choose 24-hour history: <em>You → Sharing and quiet hours</em>.</li>
+  <li>See everyone who can see you and stop any of them: <em>You → Who can see me</em>.</li>
+  <li>Change or remove your details: <em>You → Name and social links</em>.</li>
+  <li>Delete your account and everything linked to it: <em>You → Delete account</em>, or <a href="/delete-account">without the app</a>.</li>
+  <li>Ask for a copy of your data or ask a question: [contact email].</li>
+</ul>
+
+<h2>Age</h2>
+<p>BondhuKoi is for university students. You must be at least 16 to use it.</p>
+
+<h2>Security</h2>
+<p>Connections are encrypted, the database refuses direct access from the app, and admins must use two-factor sign-in. Our security review is public in the code repository. Found a problem? <a href="https://github.com/omikhan4901/bondhukoi/security/policy">Tell us privately</a>.</p>
+
+<h2>Changes</h2>
+<p>If what we collect changes, we’ll update this page and tell you in the app before it takes effect.</p>
+
+<h2>Contact</h2>
+<p>[contact email]</p>
+</main>
+<footer><div class="wrap"><a href="/privacy">Privacy policy</a><a href="/terms">Terms</a><a href="/delete-account">Delete your account</a><a href="https://github.com/omikhan4901/bondhukoi/security/policy">Report a security problem</a><p>BondhuKoi is a student project from Bangladesh. It never stores your location.</p></div></footer>
+</body>
+</html>

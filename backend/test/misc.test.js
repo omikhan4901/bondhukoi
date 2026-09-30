@@ -111,3 +111,31 @@ test('sign-up check explains what is wrong without using up invites', async () =
   assert.equal((await check({ email: 'a@northsouth.edu' })).body.reason, 'closed');
   ctx.app.ctx.settings.invalidate();
 });
+
+test('scheduled clean-up keeps the retention promises in the privacy policy', async () => {
+  const a = await createUser(ctx.db);
+  const b = await createUser(ctx.db);
+  await ctx.db.exec(`update profiles set short_history = false where id = $1`, [b.id]);
+  await ctx.db.exec(
+    `insert into transitions (user_id, zone, kind, at) values
+       ($1, 'campus', 'enter', now() - interval '25 hours'), ($1, 'campus', 'exit', now() - interval '1 hour'),
+       ($2, 'campus', 'enter', now() - interval '25 hours'), ($2, 'campus', 'exit', now() - interval '31 days')`,
+    [a.id, b.id],
+  );
+  await ctx.db.exec(`insert into presence (user_id, on_campus, checked_at) values ($1, true, now() - interval '13 hours')`, [a.id]);
+  await ctx.db.exec(
+    `insert into reports (reporter_id, target_user_id, reason, status, updated_at) values ($1, $2, 'spam', 'closed', now() - interval '13 months'), ($1, $2, 'spam', 'new', now() - interval '13 months')`,
+    [a.id, b.id],
+  );
+  await ctx.db.exec(`insert into feedback (user_id, message, created_at) values ($1, 'old', now() - interval '13 months'), ($1, 'new', now())`, [a.id]);
+  await ctx.db.exec(`alter table reports disable trigger reports_touch`);
+  await ctx.db.exec(`update reports set updated_at = now() - interval '13 months'`);
+  await ctx.db.exec(`alter table reports enable trigger reports_touch`);
+
+  await ctx.db.exec('select prune_history(); select prune_support();');
+  assert.equal((await ctx.db.one('select count(*) as n from transitions where user_id = $1', [a.id])).n, 1, '24-hour history');
+  assert.equal((await ctx.db.one('select count(*) as n from transitions where user_id = $1', [b.id])).n, 1, '30-day history');
+  assert.equal((await ctx.db.one('select on_campus from presence where user_id = $1', [a.id])).on_campus, false, 'stale presence cleared');
+  assert.deepEqual((await ctx.db.many('select status from reports')).map((r) => r.status), ['new'], 'open reports are kept');
+  assert.deepEqual((await ctx.db.many('select message from feedback')).map((r) => r.message), ['new']);
+});

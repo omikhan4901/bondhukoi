@@ -1,0 +1,48 @@
+:root {
+  --brand: #c2410c; --brand-dark: #9a3412; --brand-50: #fff4ee; --brand-100: #ffe4d5;
+  --ink: #0f172a; --muted: #5b6b7f; --line: #e2e8f0; --page: #f8fafc; --surface: #fff; --here: #15803d; --here-soft: #f0fdf4;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --brand: #fb923c; --brand-dark: #fdba74; --brand-50: #2a1508; --brand-100: #7c2d12; --ink: #f1f5f9; --muted: #94a3b8; --line: #1e293b; --page: #0b1220; --surface: #111a2e; --here: #4ade80; --here-soft: #0b2416; }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--page); color: var(--ink); font: 16px/1.6 Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; -webkit-font-smoothing: antialiased; }
+a { color: var(--brand); }
+.wrap { max-width: 1040px; margin: 0 auto; padding-left: 16px; padding-right: 16px; }
+header.top { background: var(--surface); border-bottom: 1px solid var(--line); }
+header.top .wrap { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+.logo { display: flex; align-items: center; gap: 10px; font: 700 20px/1 "Plus Jakarta Sans", Inter, sans-serif; color: var(--ink); text-decoration: none; letter-spacing: -0.3px; }
+.logo b { color: var(--brand); font-weight: 700; }
+nav a { color: var(--muted); text-decoration: none; margin-left: 20px; font-weight: 500; font-size: 15px; }
+h1, h2, h3 { font-family: "Plus Jakarta Sans", Inter, sans-serif; letter-spacing: -0.4px; line-height: 1.2; }
+h1 { font-size: clamp(32px, 6vw, 52px); margin: 0 0 16px; }
+.hero { padding-top: 72px; padding-bottom: 48px; display: grid; gap: 40px; grid-template-columns: 1.1fr 0.9fr; align-items: center; }
+.lead { color: var(--muted); font-size: 18px; max-width: 520px; }
+.pill { display: inline-flex; align-items: center; gap: 8px; background: var(--brand-50); color: var(--brand); border: 1px solid var(--brand-100); border-radius: 999px; padding: 4px 12px; font-size: 14px; font-weight: 500; margin-bottom: 20px; }
+.btn { display: inline-block; background: var(--brand); color: #fff; padding: 14px 22px; border-radius: 12px; font-weight: 600; text-decoration: none; }
+.btn.secondary { background: var(--surface); color: var(--ink); border: 1px solid var(--line); margin-left: 8px; }
+.phone { background: var(--surface); border: 1px solid var(--line); border-radius: 28px; padding: 20px; max-width: 340px; margin-left: auto; }
+.row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.row:last-child { border: 0; }
+.av { width: 36px; height: 36px; border-radius: 50%; background: var(--brand-50); color: var(--brand); display: grid; place-items: center; font-weight: 600; font-size: 13px; flex: none; }
+.status { display: inline-flex; align-items: center; gap: 6px; background: var(--here-soft); color: var(--here); border-radius: 999px; padding: 1px 8px; font-size: 12px; font-weight: 500; }
+.status::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.status.away { background: var(--page); color: var(--muted); }
+section.band { background: var(--surface); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 56px 0; }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 20px; }
+.band .card { background: var(--page); }
+.tile { width: 40px; height: 40px; border-radius: 12px; background: var(--brand-50); border: 1px solid var(--brand-100); display: grid; place-items: center; color: var(--brand); margin-bottom: 12px; }
+.card h3 { margin: 0 0 6px; font-size: 18px; }
+.card p { margin: 0; color: var(--muted); font-size: 15px; }
+footer { padding: 32px 0 48px; color: var(--muted); font-size: 14px; }
+footer a { color: var(--muted); margin-right: 16px; }
+.doc { max-width: 720px; padding: 48px 16px 64px; margin: 0 auto; }
+.doc h1 { font-size: 36px; }
+.doc h2 { font-size: 22px; margin-top: 36px; }
+.doc p, .doc li { color: var(--ink); }
+.doc .muted { color: var(--muted); }
+table { border-collapse: collapse; width: 100%; font-size: 15px; }
+td, th { border-bottom: 1px solid var(--line); padding: 10px 8px; text-align: left; vertical-align: top; }
+@media (max-width: 760px) { .hero, .grid3 { grid-template-columns: 1fr; } .phone { margin: 0 auto; } nav a:not(:last-child) { display: none; } .btn.secondary { margin: 8px 0 0; } }
