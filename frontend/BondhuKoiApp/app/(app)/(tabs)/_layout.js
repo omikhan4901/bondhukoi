@@ -20,8 +20,8 @@ export default function TabsLayout() {
         headerShown: false,
         tabBarActiveTintColor: c.brand,
         tabBarInactiveTintColor: c.faint,
-        tabBarStyle: { backgroundColor: c.surface, borderTopColor: c.line, borderTopWidth: 1, height: 70 + insets.bottom, paddingTop: 8, paddingBottom: insets.bottom + 12 },
-        tabBarLabelStyle: { fontFamily: fonts.bodyMedium, fontSize: 12, lineHeight: 16, marginTop: 2 },
+        tabBarStyle: { backgroundColor: c.surface, borderTopColor: c.line, borderTopWidth: 1, height: 64 + insets.bottom, paddingTop: 6, paddingBottom: insets.bottom + 6 },
+        tabBarLabelStyle: { fontFamily: fonts.bodyMedium, fontSize: 12, lineHeight: 16 },
         tabBarBadgeStyle: { backgroundColor: c.brand, color: c.onBrand, fontSize: 10 },
         sceneStyle: { backgroundColor: c.page },
       }}
