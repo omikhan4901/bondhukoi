@@ -132,6 +132,13 @@ production deploys after you approve it in the Actions tab.
 
 ---
 
+### 2.8 Optional: daily alert emails
+Make a free [Resend](https://resend.com) account and API key. Add Cloud Run secrets/env
+`ALERTS_SECRET` (a random 40-character string), `RESEND_API_KEY`, `ALERT_EMAIL` (your
+address) and `ALERT_FROM`, and the GitHub repository secret `ALERTS_SECRET` with the same
+random string. The daily keep-alive job then emails you only when something needs
+attention (urgent reports, a queue over a day old, sign-up bursts, 70% of a free limit).
+
 ## 3. Cloudflare Pages (admin console and website)
 
 1. <https://dash.cloudflare.com> → **Workers & Pages → Create → Pages → Connect to Git**

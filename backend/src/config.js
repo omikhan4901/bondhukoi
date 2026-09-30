@@ -27,6 +27,11 @@ export function loadConfig(env = process.env) {
     logLevel: env.LOG_LEVEL || (production ? 'info' : 'debug'),
     trustProxy: env.TRUST_PROXY !== 'false',
     expoAccessToken: env.EXPO_ACCESS_TOKEN || '',
+    // Daily admin alert emails (optional): see routes/internal.js.
+    alertsSecret: env.ALERTS_SECRET || '',
+    resendApiKey: env.RESEND_API_KEY || '',
+    alertEmail: env.ALERT_EMAIL || '',
+    alertFrom: env.ALERT_FROM || '',
   };
 
   if (config.jwtSecret && config.jwtSecret.length < 32) {

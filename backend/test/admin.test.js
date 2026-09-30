@@ -1,6 +1,7 @@
 import { test, before, after, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { setup, teardown, reset, createUser, call, befriend, makeCircle, noQuietHours, NSU_ZONE, LIBRARY } from './helpers.js';
+import { collectAlerts } from '../src/routes/internal.js';
 
 let ctx;
 before(async () => (ctx = await setup()));
@@ -154,4 +155,16 @@ test('reports queue and user timeline', async () => {
   const detail = await api('GET', `/api/admin/users/${b.id}`, { user: boss });
   assert.equal(detail.body.reports.length, 1);
   assert.ok(detail.body.timeline.some((e) => e.kind === 'signed_up'));
+});
+
+test('daily alerts: urgent reports and slow queues, and the endpoint needs the secret', async () => {
+  const a = await createUser(ctx.db);
+  const b = await createUser(ctx.db);
+  assert.deepEqual(await collectAlerts(ctx.db), []);
+  await ctx.db.exec(`insert into reports (reporter_id, target_user_id, reason, created_at) values ($1, $2, 'stalking', now() - interval '2 days')`, [a.id, b.id]);
+  const alerts = await collectAlerts(ctx.db);
+  assert.equal(alerts.length, 2);
+  assert.match(alerts[0], /stalking or harassment/);
+  assert.equal((await api('POST', '/api/internal/alerts')).status, 403);
+  assert.equal((await api('POST', '/api/internal/alerts', { headers: { 'x-alerts-secret': 'x'.repeat(40) } })).status, 403, 'no secret configured: always refused');
 });

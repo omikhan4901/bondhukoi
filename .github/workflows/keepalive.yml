@@ -15,3 +15,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: curl --fail --silent --show-error --max-time 30 --retry 3 --retry-delay 20 "${{ vars.API_URL }}/health"
+      - name: Admin alerts (emails only when something needs attention)
+        env:
+          ALERTS_SECRET: ${{ secrets.ALERTS_SECRET }}
+        if: env.ALERTS_SECRET != ''
+        run: curl --fail --silent --show-error --max-time 30 -X POST -H "x-alerts-secret: $ALERTS_SECRET" "${{ vars.API_URL }}/api/internal/alerts"

@@ -8,7 +8,7 @@ before(async () => (ctx = await setup()));
 after(teardown);
 beforeEach(() => reset(ctx.db));
 
-const PUBLIC = new Set(['GET /health', 'GET /api/config', 'GET /api/universities', 'POST /api/signup-check']);
+const PUBLIC = new Set(['GET /health', 'GET /api/config', 'GET /api/universities', 'POST /api/signup-check', 'POST /api/internal/alerts']);
 const routes = () => ctx.app.routeList.filter((r) => r.url !== '*' && !r.url.startsWith('/documentation'));
 
 test('every route except the public ones needs a signed-in user', async () => {
