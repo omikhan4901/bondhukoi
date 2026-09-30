@@ -72,7 +72,7 @@ export async function checkPresence(ctx, userId, { lat, lng, accuracy }, now = n
   });
 
   if (result.transitions.length) await alertWatchers(ctx, userId, result.profile.name, result.transitions);
-  const { profile, transitions, ...response } = result;
+  const { profile: _profile, transitions, ...response } = result;
   return { ...response, changes: transitions.length };
 }
 

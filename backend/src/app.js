@@ -40,6 +40,11 @@ export async function buildApp({ config, db, verifyToken, storage, push, authAdm
   const auth = createAuthHooks(ctx);
   ctx.auth = auth;
   app.decorate('ctx', ctx);
+  app.decorate('routeList', []);
+  app.addHook('onRoute', (route) => {
+    const methods = [].concat(route.method).filter((m) => m !== 'HEAD');
+    for (const method of methods) app.routeList.push({ method, url: route.url });
+  });
   app.decorateRequest('user', null);
   app.decorateRequest('admin', null);
 
