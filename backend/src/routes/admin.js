@@ -414,7 +414,7 @@ export default async function adminRoutes(app) {
          left join profiles tp on tp.id = r.target_user_id
          left join circles c on c.id = r.target_circle_id
         where ($1::text is null or r.status = $1)
-        order by (r.status = 'new') desc, r.created_at desc limit 50 offset $2`,
+        order by (r.status = 'new') desc, (r.reason in ('stalking', 'harassment')) desc, r.created_at desc limit 50 offset $2`,
       [status, offset],
     );
     return {
