@@ -1,0 +1,40 @@
+name: Database backup
+
+# Weekly encrypted dump of the production database, kept 30 days as a workflow artifact.
+# The repository is public, so the dump is encrypted before it is uploaded; without
+# BACKUP_PASSPHRASE it is unreadable. Restore steps: docs/backups.md.
+on:
+  schedule:
+    - cron: '41 20 * * 0'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    if: vars.BACKUPS_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Install the PostgreSQL 17 client
+        run: |
+          sudo apt-get install -y -q postgresql-common
+          sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+          sudo apt-get install -y -q postgresql-client-17
+      - name: Dump and encrypt
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+          test -n "$BACKUP_PASSPHRASE"
+          name="bondhukoi-$(date -u +%Y%m%d).dump"
+          /usr/lib/postgresql/17/bin/pg_dump --format=custom --no-owner --schema=public --schema=auth "$SUPABASE_DB_URL" \
+            | gpg --batch --yes --symmetric --cipher-algo AES256 --passphrase "$BACKUP_PASSPHRASE" -o "$name.gpg"
+          echo "FILE=$name.gpg" >> "$GITHUB_ENV"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.FILE }}
+          path: ${{ env.FILE }}
+          retention-days: 30

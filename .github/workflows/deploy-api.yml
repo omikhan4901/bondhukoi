@@ -1,0 +1,56 @@
+name: Deploy API
+
+# Staging on every push to main that touches the API or migrations; production on a
+# version tag (v1.2.3). Needs the Google Cloud and Supabase settings in docs/deploy.md.
+on:
+  push:
+    branches: [main]
+    paths: ['backend/**', 'supabase/migrations/**']
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: vars.GCP_PROJECT_ID != ''
+    runs-on: ubuntu-latest
+    environment: ${{ startsWith(github.ref, 'refs/tags/v') && 'production' || 'staging' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Apply database migrations
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - run: supabase db push --db-url "$SUPABASE_DB_URL"
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SERVICE_ACCOUNT }}
+
+      - uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: ${{ vars.CLOUD_RUN_SERVICE }}
+          region: asia-south1
+          source: backend
+          flags: >-
+            --max-instances=2 --min-instances=0 --memory=512Mi --cpu=1
+            --concurrency=80 --timeout=15 --allow-unauthenticated
+            --service-account=${{ vars.GCP_RUNTIME_SERVICE_ACCOUNT }}
+          env_vars: |
+            NODE_ENV=production
+            CORS_ORIGINS=${{ vars.CORS_ORIGINS }}
+            SUPABASE_URL=${{ vars.SUPABASE_URL }}
+          secrets: |
+            DATABASE_URL=bondhukoi-database-url:latest
+            SUPABASE_SERVICE_ROLE_KEY=bondhukoi-supabase-service-key:latest

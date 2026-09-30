@@ -12,21 +12,21 @@ import pg from 'pg';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '../..');
-const DEFAULT_URL = 'postgres://postgres:postgres@localhost:54329/postgres';
+const DEFAULT_URL = 'postgres://postgres@localhost:54329/postgres';
 const url = process.env.TEST_DATABASE_URL || DEFAULT_URL;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 function ensureContainer() {
   if (process.env.TEST_DATABASE_URL) return;
-  const running = execFileSync('docker', ['ps', '-q', '-f', 'name=^bk-testdb$'], { encoding: 'utf8' }).trim();
+  const running = execFileSync('docker', ['ps', '-q', '-f', 'name=^bondhukoi-testdb$'], { encoding: 'utf8' }).trim();
   if (running) return;
-  const exists = execFileSync('docker', ['ps', '-aq', '-f', 'name=^bk-testdb$'], { encoding: 'utf8' }).trim();
+  const exists = execFileSync('docker', ['ps', '-aq', '-f', 'name=^bondhukoi-testdb$'], { encoding: 'utf8' }).trim();
   if (exists) {
-    execFileSync('docker', ['start', 'bk-testdb'], { stdio: 'ignore' });
+    execFileSync('docker', ['start', 'bondhukoi-testdb'], { stdio: 'ignore' });
   } else {
     execFileSync(
       'docker',
-      ['run', '-d', '--name', 'bk-testdb', '-e', 'POSTGRES_PASSWORD=postgres', '-p', '54329:5432', 'postgis/postgis:16-3.4-alpine'],
+      ['run', '-d', '--name', 'bondhukoi-testdb', '-e', 'POSTGRES_HOST_AUTH_METHOD=trust', '-p', '54329:5432', 'postgis/postgis:16-3.4-alpine'],
       { stdio: 'ignore' },
     );
   }

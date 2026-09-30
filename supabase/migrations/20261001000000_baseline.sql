@@ -50,6 +50,8 @@ create table profiles (
   quiet_end smallint not null default 6 check (quiet_end between 0 and 23),
   short_history boolean not null default true, -- true: 24 hours, false: 30 days
   notify jsonb not null default '{}'::jsonb,
+  -- Access tokens issued before this are refused (sign out everywhere, bans).
+  sessions_revoked_at timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   last_active_at timestamptz

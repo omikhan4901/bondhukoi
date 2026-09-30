@@ -21,7 +21,7 @@ PostGIS, Auth and Storage on your machine; `supabase/` holds its config and migr
 npm test
 ```
 
-Starts (or reuses) a PostGIS container called `bk-testdb`, rebuilds the schema from
+Starts (or reuses) a PostGIS container called `bondhukoi-testdb`, rebuilds the schema from
 `supabase/migrations`, and runs every test with `node --test`. Set `TEST_DATABASE_URL` to
 use another database (CI does).
 

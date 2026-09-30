@@ -4,8 +4,9 @@ import { buildApp } from '../src/app.js';
 import { createTokenVerifier } from '../src/adapters/tokens.js';
 
 export const SUPABASE_URL = 'http://supabase.test';
-export const JWT_SECRET = 'test-secret-that-is-at-least-32-characters-long';
-const DB_URL = process.env.TEST_DATABASE_URL || 'postgres://postgres:postgres@localhost:54329/postgres';
+// Signs fake tokens for tests only; the test API is built with it and nothing else is.
+export const JWT_SECRET = 'x'.repeat(40);
+const DB_URL = process.env.TEST_DATABASE_URL || 'postgres://postgres@localhost:54329/postgres';
 
 // A square around North South University (Bashundhara, Dhaka), about 400 m across,
 // and points inside and outside it.

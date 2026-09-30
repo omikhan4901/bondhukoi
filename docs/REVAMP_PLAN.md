@@ -629,3 +629,9 @@ The quickest safe path to real users is 0 → 1 → 2 → 3 → 7 (backend parts
 | 2026-09-30 | Hosting: Supabase Free + Cloud Run + Cloudflare Pages (Mumbai region). Heroku guide retired. | Proposed |
 | 2026-09-30 | Design follows ResumeX's principles with a different brand colour; the "Digital Sanctuary" system is retired. | Owner (principles), proposed (details) |
 | 2026-09-30 | Admins never see location data; enforced in the API. | Proposed |
+| 2026-09-30 | Going with the recommended defaults for D1–D7 (university email only, Supabase Auth, Android first, koi orange, cut chat/Places/2FA/login history, NSU beta, public repo). | Owner ("continue with the plan") |
+| 2026-09-30 | The API talks to Postgres directly (`pg`) instead of PostgREST, so every query is parameterised and the Data API can be switched off for `public`. | Decided |
+| 2026-09-30 | Paused, quiet hours and suspended all show friends the same "off" state, so nobody can tell which. | Decided |
+| 2026-09-30 | Circles can only invite friends of the inviter; watch alerts about circles go only to watchers in that circle. | Decided |
+| 2026-09-30 | Test database runs without a password (local Docker only) so secret scanners don't flag test code. | Decided (after a GitGuardian false positive) |
+
