@@ -50,6 +50,6 @@
   },
   "private": true,
   "devDependencies": {
-    "@tamagui/cli": "^2.0.0-rc.29"
+    "@tamagui/cli": "^2.7.7"
   }
 }
